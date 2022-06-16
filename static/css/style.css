@@ -1,0 +1,11 @@
+div{
+    width: 1200px;
+    background-color: rgb(242, 126, 251);
+  }
+  ul{
+   display: flex;
+  }
+  li{
+    list-style: none;
+    margin-left: 100px;
+  }

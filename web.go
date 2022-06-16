@@ -5,7 +5,10 @@ import (
 	"net/http"
 	"text/template"
 
+	"fmt"
 	"os"
+
+	"github.com/PuerkitoBio/goquery"
 
 	"github.com/gorilla/sessions"
 )
@@ -46,16 +49,11 @@ func home(w http.ResponseWriter, rq *http.Request) {
 
 // tvlist handler.
 func tvlist(w http.ResponseWriter, rq *http.Request) {
-	data := []string{
-		"6/15", "6/16", "6/17", "6/18", "6/19", "6/20", "6/21",
-	}
 
 	item := struct {
 		Title string
-		Data  []string
 	}{
 		Title: "番組表",
-		Data:  data,
 	}
 
 	er := page("tvlist").Execute(w, item)
@@ -78,6 +76,19 @@ func main() {
 	})
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(dir+"/static/"))))
+
+	doc, err := goquery.NewDocument("https://tv.yahoo.co.jp/search/?q=川島明")
+	if err != nil {
+		fmt.Print("document not found. ")
+		os.Exit(1)
+	}
+
+	program := ""
+	doc.Find(".programlist > li").Each(func(_ int, s *goquery.Selection) {
+		program += s.Text() + "\n"
+	})
+
+	fmt.Print(program)
 
 	http.ListenAndServe(":8080", nil)
 }
